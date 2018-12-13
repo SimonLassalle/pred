@@ -1,8 +1,0 @@
-gym_env/
-  README.md
-  setup.py
-  gym_env/
-    __init__.py
-    envs/
-      __init__.py
-      polyhash_gym_env.py

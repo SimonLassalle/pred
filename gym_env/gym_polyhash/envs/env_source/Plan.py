@@ -7,6 +7,10 @@ from random import choices
 import os.path
 
 class Plan:
+
+    def __init__(self):
+        pass
+        
     def __init__(self, filename):
         self.filename = filename
         self.nb_rows = 0
@@ -37,7 +41,7 @@ class Plan:
         self.cellsId=np.full((self.nb_rows, self.nb_columns), -1, dtype=np.int32)
 
     # Loads an input file and initialize all internal structures
-    def loadFile(self, filename): 
+    def loadFile(self, filename):
         # this set is for detecting duplicate building projects
         unique_projects = set()
         with open(filename,'r') as file:
@@ -53,7 +57,7 @@ class Plan:
             for i in range(self.number_of_building_projects):
                 # next we have number_of_buildings lines for each type of building
                 line=file.readline()
-                # build a project descriptor that will be used to detect if a building project is duplicated 
+                # build a project descriptor that will be used to detect if a building project is duplicated
                 # in the input file
                 prj_desc=line
                 fields=line.split()
@@ -262,7 +266,7 @@ class Plan:
         # green
         img[utility] = greens[-self.cellsVal[utility]%nb_greens]
         imwrite(filename, img )
-        
+
     # Generates the output file (and building map)
     def savePlan(self):
         out_filename = self.filename[0:-3]+".out"
