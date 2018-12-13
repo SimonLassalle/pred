@@ -1,0 +1,11 @@
+.DS_Store
+bin
+lib
+__pycache__
+*.png
+*.out
+*.score
+pyvenv.cfg
+.vscode/*
+debug.png
+pip-selfcheck.json
