@@ -1,10 +1,10 @@
 from sys import argv
 from random import randrange, seed
 import numpy as np
-from Plan import Plan
-from Building import Building
+from gym_env.gym_polyhash.envs.env_source.Plan import Plan
+from gym_env.gym_polyhash.envs.env_source.Building import Building
 from time import time
-from ProjectType import ProjectType
+from gym_env.gym_polyhash.envs.env_source.ProjectType import ProjectType
 import math
 
 if __name__ == '__main__':
@@ -125,4 +125,3 @@ if __name__ == '__main__':
         #print(my_plan.cellsVal)
         #print()
         #print(my_plan.cellsId)
-    

@@ -2,9 +2,9 @@ from sys import argv
 from random import randrange, seed, shuffle
 import numpy as np
 from Plan import Plan
-from Building import Building
+from gym_env.gym_polyhash.envs.env_source.Building import Building
 from time import time
-from ProjectType import ProjectType
+from gym_env.gym_polyhash.envs.env_source.ProjectType import ProjectType
 
 if __name__ == '__main__':
     my_plan = Plan(argv[1])

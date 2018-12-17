@@ -9,3 +9,4 @@ pyvenv.cfg
 .vscode/*
 debug.png
 pip-selfcheck.json
+mon_pkg/*

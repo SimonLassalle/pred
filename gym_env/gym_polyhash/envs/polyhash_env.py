@@ -2,25 +2,17 @@ import os, subprocess, time, signal
 import gym
 from gym import error, spaces
 
-from env_source import Plan
-
-import logging
-logger = logging.getLogger(__name__)
+import referee as hash
 
 class PolyhashEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self):
-        self.env = None
-        self.observation_space = spaces.Box(low=-1, high=1,
-                                            shape=1)
+        self.env = hash.Plan('data_small/a_example.in')
+        self.observation_space = spaces.Discrete(4)
         # Action space omits the Tackle/Catch actions, which are useful on defense
-        self.action_space = spaces.Tuple((spaces.Discrete(3),
-                                          spaces.Box(low=0, high=100, shape=1),
-                                          spaces.Box(low=-180, high=180, shape=1),
-                                          spaces.Box(low=-180, high=180, shape=1),
-                                          spaces.Box(low=0, high=100, shape=1),
-                                          spaces.Box(low=-180, high=180, shape=1)))
+        self.action_space = spaces.Tuple((spaces.Discrete(3), spaces.Box(low=0, high=3, shape=(3, 3))))
+        self._seed = 123
 
     def _step(self, action):
         self._take_action(action)

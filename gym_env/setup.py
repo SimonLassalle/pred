@@ -1,6 +1,7 @@
 from setuptools import setup
 
-setup(name='gym_polyhash',
+setup(name='gympolyhash',
       version='0.0.1',
-      install_requires=['gym>=0.2.3']
+      install_requires=['gym>=0.2.3'],
+      packages=['gym_polyhash'],
 )

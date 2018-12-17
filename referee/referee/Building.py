@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.ndimage import distance_transform_cdt
-from ProjectType import ProjectType
+from referee.ProjectType import ProjectType
 
 # This is a building project -> kind of building that can be put on the plan
 class BuildingProject:
@@ -35,7 +35,7 @@ class BuildingProject:
         manhattan_coords =  (manhattan_coords[0]-max_walking_distance, manhattan_coords[1]-max_walking_distance)
         for i in range(len(manhattan_coords[0])):
             self.manhattan_coords.append((manhattan_coords[0][i],manhattan_coords[1][i]))"""
-        
+
     def __str__(self):
         project = ""
         project += "Project #" + str(self.id) + "\n"

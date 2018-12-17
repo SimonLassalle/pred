@@ -1,5 +1,5 @@
-from Building import BuildingProject, ResidentialProject, UtilityProject, Building
-from ProjectType import ProjectType
+from referee.Building import BuildingProject, ResidentialProject, UtilityProject, Building
+from referee.ProjectType import ProjectType
 from imageio import imwrite
 import numpy as np
 import sys
@@ -8,9 +8,6 @@ import os.path
 
 class Plan:
 
-    def __init__(self):
-        pass
-        
     def __init__(self, filename):
         self.filename = filename
         self.nb_rows = 0
