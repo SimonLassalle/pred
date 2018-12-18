@@ -1,6 +1,7 @@
 import os, subprocess, time, signal
 import gym
 from gym import error, spaces
+from random import randint
 
 import referee as hash
 
@@ -18,13 +19,11 @@ class PolyhashEnv(gym.Env):
         self.reward = 0
         self.action = None
 
-        self.number_of_steps = 0
-        self.max_number_of_steps = 100
-
-        self._seed = 123
+        self._seed = randint(0, 200)
         self.observation_space = spaces.Box(low=0,
                                             high=self.number_of_actions,
                                             shape=(self.window_width, self.window_height))
+        # TODO: add window movement in action_space
         self.action_space = spaces.Tuple([spaces.Discrete(self.number_of_actions),
                                             spaces.Discrete(self.window_width),
                                             spaces.Discrete(self.window_height)])
@@ -32,10 +31,21 @@ class PolyhashEnv(gym.Env):
     def step(self, action):
         self._take_action(action)
         reward = self._get_reward()
-        ob = self.env.cellsId
-        episode_over = self.number_of_steps >= self.max_number_of_steps
-        self.number_of_steps += 1
+        ob = self.getObservationSpace()
+        episode_over = False
         return ob, reward, episode_over, {}
+
+    def getObservationSpace(self):
+        """
+        Transform the """
+        new_observation = []#self.env.cellsId[:]
+        for x in range(len(self.env.cellsId)):
+            new_observation.append([])
+            for y in range(len(self.env.cellsId[0])):
+                if self.env.cellsId[x][y] != -1:
+                    new_observation.append(self.env.buildings[self.env.cellsId[x][y]].project.id)
+        return new_observation
+
 
     def _take_action(self, action):
         id = action[0]
@@ -75,10 +85,10 @@ class PolyhashEnv(gym.Env):
         """ Set the environment's cells arrays to initial values. """
         self.previous_score = 0
         self.bad_action = False
-        self.number_of_steps = 0
         self.reward = 0
         self.env.reset()
+        return self.getObservationSpace()
 
     def render(self, mode='human', close=False):
         """ Viewer only supports human mode currently. """
-        print(self.env.cellsVal)
+        print(self.env.cellsId)
