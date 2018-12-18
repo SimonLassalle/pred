@@ -9,19 +9,45 @@ class PolyhashEnv(gym.Env):
 
     def __init__(self):
         self.env = hash.Plan('data_small/a_example.in')
-        self.observation_space = spaces.Discrete(4)
-        # Action space omits the Tackle/Catch actions, which are useful on defense
-        self.action_space = spaces.Tuple((spaces.Discrete(3), spaces.Box(low=0, high=3, shape=(3, 3))))
-        self._seed = 123
+        self.number_of_actions = self.env.number_of_building_projects
+        self.window_width = self.env.nb_rows
+        self.window_height = self.env.nb_columns
+        self.bad_action = False
+        self.previous_score = 0
 
-    def _step(self, action):
+        self.reward = 0
+        self.action = None
+
+        self.number_of_steps = 0
+        self.max_number_of_steps = 100
+
+        self._seed = 123
+        self.observation_space = spaces.Box(low=0,
+                                            high=self.number_of_actions,
+                                            shape=(self.window_width, self.window_height))
+        self.action_space = spaces.Tuple([spaces.Discrete(self.number_of_actions),
+                                            spaces.Discrete(self.window_width),
+                                            spaces.Discrete(self.window_height)])
+
+    def step(self, action):
         self._take_action(action)
         reward = self._get_reward()
-        ob = None
-        episode_over = False
+        ob = self.env.cellsId
+        episode_over = self.number_of_steps >= self.max_number_of_steps
+        self.number_of_steps += 1
         return ob, reward, episode_over, {}
 
     def _take_action(self, action):
+        id = action[0]
+        column = action[1]
+        row = action[2]
+        if self.env.canPlaceBuilding(id, row, column):
+            self.bad_action = False
+            building = self.env.createBuilding(id, row, column)
+            self.env.placeBuilding(building)
+        else:
+            self.bad_action = True
+
         """ Converts the action space into an HFO action.
         action_type = ACTION_LOOKUP[action[0]]
         if action_type == hfo_py.DASH:
@@ -33,16 +59,26 @@ class PolyhashEnv(gym.Env):
         else:
             print('Unrecognized action %d' % action_type)
             self.env.act(hfo_py.NOOP)"""
-        pass
 
     def _get_reward(self):
-        """ Reward is given for scoring a goal. """
-        pass
+        """ Reward is the difference of scores between two steps,
+        or -10 if a bad action has been chosen. """
+        if self.bad_action == True:
+            return -10
+        self.env.calcScore()
+        reward = self.env.score - self.previous_score
+        self.previous_score = self.env.score
+        self.reward = reward
+        return reward
 
-    def _reset(self):
-        """ Repeats NO-OP action until a new episode begins. """
-        pass
+    def reset(self):
+        """ Set the environment's cells arrays to initial values. """
+        self.previous_score = 0
+        self.bad_action = False
+        self.number_of_steps = 0
+        self.reward = 0
+        self.env.reset()
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         """ Viewer only supports human mode currently. """
-        print("coucou")
+        print(self.env.cellsVal)
