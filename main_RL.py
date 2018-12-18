@@ -1,10 +1,15 @@
 import numpy as np
 import gym
-import gym_env.gym_polyhash.envs.polyhash_env
 
-import keras
-from rl.agents.cem import CEMAgent
-from rl.memory import EpisodeParameterMemory
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Flatten
+from keras.optimizers import Adam
+
+from rl.agents.dqn import DQNAgent
+from rl.policy import BoltzmannQPolicy
+from rl.memory import SequentialMemory
+
+import gym_env.gym_polyhash.envs.polyhash_env
 
 ENV_NAME = 'Polyhash-v0'
 
@@ -16,25 +21,25 @@ env.seed(123)
 nb_actions = 7*4*3
 
 # Next, we build a very simple model.
-model = keras.models.Sequential()
-model.add(keras.layers.Flatten(input_shape=(1,) + env.observation_space.shape))
-model.add(keras.layers.Dense(16))
-model.add(keras.layers.Activation('relu'))
-model.add(keras.layers.Dense(16))
-model.add(keras.layers.Activation('relu'))
-model.add(keras.layers.Dense(16))
-model.add(keras.layers.Activation('relu'))
-model.add(keras.layers.Dense(nb_actions))
-model.add(keras.layers.Activation('linear'))
+model = Sequential()
+model.add(Flatten(input_shape=(1,) + env.observation_space.shape))
+model.add(Dense(16))
+model.add(Activation('relu'))
+model.add(Dense(16))
+model.add(Activation('relu'))
+model.add(Dense(16))
+model.add(Activation('relu'))
+model.add(Dense(nb_actions))
+model.add(Activation('linear'))
 print(model.summary())
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
 # even the metrics!
-memory = rl.memory.SequentialMemory(limit=50000, window_length=1)
-policy = rl.policy.BoltzmannQPolicy()
-dqn = rl.agents.dqn.DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
+memory = SequentialMemory(limit=50000, window_length=1)
+policy = BoltzmannQPolicy()
+dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
-dqn.compile(keras.optimizers.Adam(lr=1e-3), metrics=['mae'])
+dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using

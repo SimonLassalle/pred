@@ -2,6 +2,7 @@ import os, subprocess, time, signal
 import gym
 from gym import error, spaces
 from random import randint
+import numpy
 
 import referee as hash
 
@@ -43,14 +44,21 @@ class PolyhashEnv(gym.Env):
             new_observation.append([])
             for y in range(len(self.env.cellsId[0])):
                 if self.env.cellsId[x][y] != -1:
-                    new_observation.append(self.env.buildings[self.env.cellsId[x][y]].project.id)
+                    new_observation[x].append(self.env.buildings[self.env.cellsId[x][y]].project.id)
+                else:
+                    new_observation[x].append(-1)
         return new_observation
 
 
     def _take_action(self, action):
+        row = action//self.window_width
+        column = row//self.window_height
+        id = column//self.number_of_actions
+        """
         id = action[0]
         column = action[1]
         row = action[2]
+        """
         if self.env.canPlaceBuilding(id, row, column):
             self.bad_action = False
             building = self.env.createBuilding(id, row, column)
@@ -87,7 +95,7 @@ class PolyhashEnv(gym.Env):
         self.bad_action = False
         self.reward = 0
         self.env.reset()
-        return self.getObservationSpace()
+        return numpy.full((self.window_width, self.window_height), -1)
 
     def render(self, mode='human', close=False):
         """ Viewer only supports human mode currently. """
