@@ -11,7 +11,7 @@ class PolyhashEnv(gym.Env):
 
     def __init__(self):
         self.env = hash.Plan('data_small/a_example.in')
-        self.number_of_actions = self.env.number_of_building_projects
+        self.number_of_building_projects = self.env.number_of_building_projects
         self.window_width = self.env.nb_rows
         self.window_height = self.env.nb_columns
         self.bad_action = False
@@ -22,14 +22,16 @@ class PolyhashEnv(gym.Env):
 
         self._seed = randint(0, 200)
         self.observation_space = spaces.Box(low=0,
-                                            high=self.number_of_actions,
+                                            high=self.number_of_building_projects,
                                             shape=(self.window_width, self.window_height))
         # TODO: add window movement in action_space
-        self.action_space = spaces.Tuple([spaces.Discrete(self.number_of_actions),
+        """self.action_space = spaces.Tuple([spaces.Discrete(self.number_of_building_projects),
                                             spaces.Discrete(self.window_width),
-                                            spaces.Discrete(self.window_height)])
+                                            spaces.Discrete(self.window_height)])"""
+        self.action_space = spaces.Box(numpy.array([0,0,0]), numpy.array([self.number_of_building_projects,self.window_width,self.window_height]))
 
     def step(self, action):
+        print(action)
         self._take_action(action)
         reward = self._get_reward()
         ob = self.getObservationSpace()
@@ -51,13 +53,19 @@ class PolyhashEnv(gym.Env):
 
 
     def _take_action(self, action):
-        row = action//self.window_width
+        """row = action//self.window_width
         column = row//self.window_height
-        id = column//self.number_of_actions
+        id = column//self.number_of_building_projects
         """
         id = action[0]
         column = action[1]
         row = action[2]
+        """
+        row = action % self.window_width
+        rest = action // self.window_width
+        column = rest % self.window_height
+        rest = rest // self.window_height
+        id = rest % self.number_of_building_projects
         """
         if self.env.canPlaceBuilding(id, row, column):
             self.bad_action = False
