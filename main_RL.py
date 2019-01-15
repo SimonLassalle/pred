@@ -2,7 +2,7 @@ import numpy as np
 import gym
 
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten, Reshape, Input
+from keras.layers import Dense, Activation, Flatten, Reshape, Input, Dropout
 from keras.optimizers import Adam
 
 from rl.agents.dqn import DQNAgent
@@ -19,36 +19,29 @@ env = gym.make(ENV_NAME)
 np.random.seed(123)
 env.seed(123)
 
+number_of_actions = 7*4*3
+
 # Next, we build a very simple model.
 model = Sequential()
-# 'Dense' is the basic form of a neural network layer
-# Input Layer of state size(4) and Hidden Layer with 24 nodes
-model.add(Dense(24, input_dim=env.observation_space.shape, activation='relu'))
-# Hidden layer with 24 nodes
-model.add(Dense(24, activation='relu'))
-# Output Layer with # of actions: 2 nodes (left, right)
-model.add(Dense(env.action_space.shape[0], activation='linear'))
-"""
-model.add(Flatten(input_shape=(1,) + env.observation_space.shape))
-model.add(Dense(16))
-model.add(Activation('relu'))
-model.add(Dense(16))
-model.add(Activation('relu'))
-model.add(Dense(16))
-model.add(Activation('relu'))
-model.add(Dense(nb_actions))
-model.add(Activation('linear'))
-"""
-print(model.summary())
+# Input - Layer
+model.add(Dense(3, activation = "relu", input_shape=(number_of_actions, )))
 
-print("observation_space.shape : ", env.observation_space.shape)
-print("action_space.shape : ", env.action_space.shape)
+# Hidden - Layers
+model.add(Dropout(0.3, noise_shape=None, seed=None))
+model.add(Dense(3, activation = "relu"))
+model.add(Dropout(0.2, noise_shape=None, seed=None))
+model.add(Dense(3, activation = "relu"))
+
+# Output- Layer
+model.add(Dense(3, activation = "sigmoid"))
+
+model.summary()
 
 # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
 # even the metrics!
 memory = SequentialMemory(limit=50000, window_length=1)
 policy = BoltzmannQPolicy()
-dqn = DQNAgent(model=model, nb_actions=env.action_space.shape[0], memory=memory, nb_steps_warmup=10,
+dqn = DQNAgent(model=model, nb_actions=3, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 

@@ -28,19 +28,17 @@ class PolyhashEnv(gym.Env):
         """self.action_space = spaces.Tuple([spaces.Discrete(self.number_of_building_projects),
                                             spaces.Discrete(self.window_width),
                                             spaces.Discrete(self.window_height)])"""
-        self.action_space = spaces.Box(numpy.array([0,0,0]), numpy.array([self.number_of_building_projects,self.window_width,self.window_height]))
+        self.action_space = spaces.Box(numpy.array([0,0,0]), numpy.array([1,1,1]))
 
     def step(self, action):
         print(action)
         self._take_action(action)
         reward = self._get_reward()
         ob = self.getObservationSpace()
-        episode_over = False
+        episode_over = self.bad_action
         return ob, reward, episode_over, {}
 
     def getObservationSpace(self):
-        """
-        Transform the """
         new_observation = []#self.env.cellsId[:]
         for x in range(len(self.env.cellsId)):
             new_observation.append([])
@@ -53,13 +51,9 @@ class PolyhashEnv(gym.Env):
 
 
     def _take_action(self, action):
-        """row = action//self.window_width
-        column = row//self.window_height
-        id = column//self.number_of_building_projects
-        """
-        id = action[0]
-        column = action[1]
-        row = action[2]
+        id = floor(action[0] * self.number_of_building_projects)
+        column = floor(action[1] * self.window_width)
+        row = floor(action[2] * self.window_height)
         """
         row = action % self.window_width
         rest = action // self.window_width
