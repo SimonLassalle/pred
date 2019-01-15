@@ -21,14 +21,20 @@ class PolyhashEnv(gym.Env):
         self.action = None
 
         self._seed = randint(0, 200)
-        self.observation_space = spaces.Box(low=0,
-                                            high=self.number_of_building_projects,
-                                            shape=(self.window_width, self.window_height))
+        self.observation_space = self.get_observation_space()
+        self.observation_space.shape = (4, 7)
         # TODO: add window movement in action_space
-        """self.action_space = spaces.Tuple([spaces.Discrete(self.number_of_building_projects),
-                                            spaces.Discrete(self.window_width),
-                                            spaces.Discrete(self.window_height)])"""
-        self.action_space = spaces.Box(numpy.array([0,0,0]), numpy.array([1,1,1]))
+        self.action_space = spaces.Tuple([spaces.Discrete(self.number_of_building_projects),spaces.Discrete(self.window_width),spaces.Discrete(self.window_height)])
+        self.action_space.shape = (3,)
+
+    def get_observation_space(self):
+        observation_space = []
+        for x in range(self.window_width) :
+            observation_space_line = []
+            for y in range(self.window_height) :
+                observation_space_line.append(spaces.Discrete(self.number_of_building_projects))
+            observation_space.append(spaces.Tuple(observation_space_line))
+        return spaces.Tuple(observation_space)
 
     def step(self, action):
         print(action)
