@@ -2,56 +2,64 @@ import numpy as np
 import gym
 
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten, Reshape, Input, Dropout
+from keras.layers import Dense, Activation, Flatten, Reshape
 from keras.optimizers import Adam
 
 from rl.agents.dqn import DQNAgent
 from rl.policy import BoltzmannQPolicy
 from rl.memory import SequentialMemory
 
+from functools import reduce
+
 import gym_env.gym_polyhash.envs.polyhash_env
 
 ENV_NAME = 'Polyhash-v0'
 
 
-# Get the environment and extract the number of actions.
+print()
 env = gym.make(ENV_NAME)
 np.random.seed(123)
 env.seed(123)
 
-number_of_actions = 7*4*3
+input_nb_nodes = reduce((lambda x, y: x * y), env.observation_space.shape)
+output_nb_nodes = 3#reduce((lambda x, y: x * y), env.action_space.shape[0])
 
-# Next, we build a very simple model.
+print("observation_space.shape : ", env.observation_space.shape)
+print("observation_space : ", env.observation_space)
+print()
+print("action_space.shape : ", env.action_space.shape)
+print("action_space : ")
+print()
+print("actions_available : ", env.actions_available)
+print()
+print("input_nb_nodes : ", input_nb_nodes)
+print("output_nb_nodes : ", output_nb_nodes)
+print("(input_nb_nodes + output_nb_nodes)//2 : ", (input_nb_nodes + output_nb_nodes)//2)
+print()
+
+print("model init")
 model = Sequential()
-# Input - Layer
-model.add(Dense(3, activation = "relu", input_shape=(number_of_actions, )))
-
-# Hidden - Layers
-model.add(Dropout(0.3, noise_shape=None, seed=None))
-model.add(Dense(3, activation = "relu"))
-model.add(Dropout(0.2, noise_shape=None, seed=None))
-model.add(Dense(3, activation = "relu"))
-
-# Output- Layer
-model.add(Dense(3, activation = "sigmoid"))
+print("adding Dense-1")
+model.add(Dense(7, input_shape=(1,) +env.observation_space.shape))
+print("adding Activation-1")
+model.add(Activation('relu'))
+print("adding Flatten-1")
+model.add(Flatten())
+print("adding Dense-2")
+model.add(Reshape((1, 28)))
+print("adding Dense-3")
+model.add(Dense(3))
 
 model.summary()
 
-# Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
-# even the metrics!
 memory = SequentialMemory(limit=50000, window_length=1)
 policy = BoltzmannQPolicy()
-dqn = DQNAgent(model=model, nb_actions=3, memory=memory, nb_steps_warmup=10,
+dqn = DQNAgent(model=model, nb_actions=output_nb_nodes, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
-# Okay, now it's time to learn something! We visualize the training here for show, but this
-# slows down training quite a lot. You can always safely abort the training prematurely using
-# Ctrl + C.
 dqn.fit(env, nb_steps=100, visualize=True, verbose=2)
 
-# After training is done, we save the final weights.
 dqn.save_weights('dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
 
-# Finally, evaluate our algorithm for 5 episodes.
 dqn.test(env, nb_episodes=5, visualize=True)
