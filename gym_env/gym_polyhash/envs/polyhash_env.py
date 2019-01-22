@@ -21,11 +21,20 @@ class PolyhashEnv(gym.Env):
         self.action = None
 
         self._seed = randint(0, 200)
+
+        self.position_building_placement = (0,0)
         self.observation_space = self.get_observation_space()
-        self.observation_space.shape = (4, 7)
-        # TODO: add window movement in action_space
-        self.action_space = spaces.Tuple([spaces.Discrete(self.number_of_building_projects),spaces.Discrete(self.window_width),spaces.Discrete(self.window_height)])
-        self.action_space.shape = (3,)
+        self.action_space = spaces.Discrete(self.number_of_building_projects + 1)
+
+        print("ENV VARIABLES :")
+        print("     number_of_building_projects :", self.number_of_building_projects)
+        print("     window_width :", self.window_width)
+        print("     window_height :", self.window_height)
+        #print("     observation_space sample :", self.observation_space.sample())
+        print("     observation_space shape :", self.observation_space.shape)
+        #print("     action_space sample :", self.action_space.sample())
+        print("     action_space shape :", self.action_space.shape)
+
 
     def get_observation_space(self):
         observation_space = []
@@ -34,14 +43,19 @@ class PolyhashEnv(gym.Env):
             for y in range(self.window_height) :
                 observation_space_line.append(spaces.Discrete(self.number_of_building_projects))
             observation_space.append(spaces.Tuple(observation_space_line))
-        return spaces.Tuple(observation_space)
+        grid = spaces.Tuple(observation_space)
+        return spaces.Tuple((grid, spaces.Tuple(self.position_building_placement)))
 
     def step(self, action):
-        print(action)
+        print()
+        print('POSITION :', self.position_building_placement)
+        print("ACTION AT STEP :", action)
         self._take_action(action)
-        reward = self._get_reward()
+        reward = self._get_reward(action)
+        print("REWARD :", reward)
         ob = self.getObservationSpace()
-        episode_over = self.bad_action
+        self._update_position_building_placement()
+        episode_over = self.position_building_placement[1] > self.window_height
         return ob, reward, episode_over, {}
 
     def getObservationSpace(self):
@@ -57,45 +71,42 @@ class PolyhashEnv(gym.Env):
 
 
     def _take_action(self, action):
-        id = floor(action[0] * self.number_of_building_projects)
-        column = floor(action[1] * self.window_width)
-        row = floor(action[2] * self.window_height)
-        """
-        row = action % self.window_width
-        rest = action // self.window_width
-        column = rest % self.window_height
-        rest = rest // self.window_height
-        id = rest % self.number_of_building_projects
-        """
-        if self.env.canPlaceBuilding(id, row, column):
-            self.bad_action = False
-            building = self.env.createBuilding(id, row, column)
-            self.env.placeBuilding(building)
-        else:
-            self.bad_action = True
+        if action != 3:
+            id = action
+            row = self.position_building_placement[0]
+            column = self.position_building_placement[1]
+            if self.env.canPlaceBuilding(id, row, column):
+                self.bad_action = False
+                building = self.env.createBuilding(id, row, column)
+                self.env.placeBuilding(building)
+            else:
+                self.bad_action = True
+        # else : the agent does nothing
 
-        """ Converts the action space into an HFO action.
-        action_type = ACTION_LOOKUP[action[0]]
-        if action_type == hfo_py.DASH:
-            self.env.act(action_type, action[1], action[2])
-        elif action_type == hfo_py.TURN:
-            self.env.act(action_type, action[3])
-        elif action_type == hfo_py.KICK:
-            self.env.act(action_type, action[4], action[5])
-        else:
-            print('Unrecognized action %d' % action_type)
-            self.env.act(hfo_py.NOOP)"""
-
-    def _get_reward(self):
+    def _get_reward(self, action):
         """ Reward is the difference of scores between two steps,
         or -10 if a bad action has been chosen. """
         if self.bad_action == True:
-            return -10
+            return -1
+        if action == 3:
+            return -2
         self.env.calcScore()
         reward = self.env.score - self.previous_score
+        print("previous_score :", self.previous_score)
+        print("actual_score :", self.env.score)
+        print("reward :", reward)
         self.previous_score = self.env.score
         self.reward = reward
         return reward
+
+    def _update_position_building_placement(self):
+        if self.bad_action :
+            self.position_building_placement = (0,0)
+        else:
+            self.position_building_placement = tuple(map(lambda x,y : x + y,self.position_building_placement,(1,0)))
+            if self.position_building_placement[0] > self.window_width:
+                self.position_building_placement = (0, self.position_building_placement[1]+1)
+        return
 
     def reset(self):
         """ Set the environment's cells arrays to initial values. """
