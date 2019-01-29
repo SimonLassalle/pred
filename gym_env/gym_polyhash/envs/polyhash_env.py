@@ -24,7 +24,7 @@ class PolyhashEnv(gym.Env):
 
         self.position_building_placement = np.array((0,0))
         self.observation_space = self.get_observation_space_1D()
-        self.action_space = spaces.Discrete(self.number_of_building_projects + 1)
+        self.action_space = self.get_action_space()
 
         print("ENV VARIABLES :")
         print("     number_of_building_projects :", self.number_of_building_projects)
@@ -57,7 +57,15 @@ class PolyhashEnv(gym.Env):
         # Adding tuple representing position_building_placement
         observation_space.append(spaces.Discrete(self.window_width))
         observation_space.append(spaces.Discrete(self.window_height))
-        return spaces.Tuple(observation_space)
+
+        observation_space = spaces.Tuple(observation_space)
+        observation_space.shape = (self.window_height * self.window_width + 2,)
+        return observation_space
+
+    def get_action_space(self):
+        action_space = spaces.Discrete(self.number_of_building_projects + 1)
+        action_space.shape = (self.number_of_building_projects + 1,)
+        return action_space
 
     def step(self, action):
         print()

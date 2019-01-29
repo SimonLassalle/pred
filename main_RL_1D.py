@@ -20,11 +20,17 @@ ENV_NAME = 'Polyhash-v0'
 
 env = gym.make(ENV_NAME)
 
+input_shape = env.observation_space.shape
+nb_neuron_input = sum(input_shape)
+
+output_shape = env.action_space.shape
+nb_neuron_output = sum(output_shape)
+
 model = Sequential()
-model.add(Dense(30, input_shape = (1, 30,)))
+model.add(Dense(nb_neuron_input, input_shape = (1,) + input_shape))
 model.add(Activation('tanh'))
 model.add(Flatten())
-model.add(Dense(4, activation='tanh'))
+model.add(Dense(nb_neuron_output, activation='tanh'))
 model.summary()
 
 memory = SequentialMemory(limit=50000, window_length=1)
