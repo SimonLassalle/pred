@@ -31,7 +31,7 @@ model = Sequential()
 model.add(Dense(nb_neuron_input, input_shape = (1,) + input_shape))
 model.add(Activation('tanh'))
 model.add(Flatten())
-model.add(Dense(nb_neuron_output, activation='tanh'))
+model.add(Dense(nb_neuron_output, activation='softmax'))
 model.summary()
 
 memory = SequentialMemory(limit=50000, window_length=1)
