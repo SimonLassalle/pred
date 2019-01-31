@@ -13,6 +13,7 @@ from rl.policy import BoltzmannQPolicy
 from rl.memory import SequentialMemory
 
 from functools import reduce
+from Metrics import Metrics
 
 import gym_env.gym_polyhash.envs.polyhash_env
 
@@ -47,7 +48,7 @@ map = Activation('tanh')(map)
 merged = Concatenate()([map, position])
 merged = Dense(nb_neuron_input * 2, activation = 'tanh')(merged)
 merged = Dense(nb_neuron_input, activation = 'tanh')(merged)
-merged = Dense(nb_neuron_output, activation='tanh')(merged)
+merged = Dense(nb_neuron_output, activation='softmax')(merged)
 
 model = Model(inputs=[inputs],outputs=[merged])
 model.summary()
@@ -59,8 +60,11 @@ dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
-dqn.fit(env, nb_steps=100, visualize=True, verbose=2)
+metrics = Metrics(dqn)
+dqn.fit(env, nb_steps=100, visualize=True, verbose=2, callbacks=[metrics])
 
 dqn.save_weights('dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
 
-dqn.test(env, nb_episodes=10, visualize=True)
+print(metrics)
+
+dqn.test(env, nb_episodes=5000, visualize=True)

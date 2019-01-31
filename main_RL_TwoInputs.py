@@ -31,7 +31,7 @@ model_position.add(Dense(2,input_shape=(2,)))
 
 merged = Concatenate()([model_map.output, model_position.output])
 out = Dense(66, activation='tanh')(merged)
-out = Dense(4, activation='tanh')(out)
+out = Dense(4, activation='softmax')(out)
 
 model = Model([model_map.input, model_position.input], [out])
 model.summary()

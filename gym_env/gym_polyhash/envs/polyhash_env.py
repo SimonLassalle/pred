@@ -26,15 +26,6 @@ class PolyhashEnv(gym.Env):
         self.observation_space = self.get_observation_space_1D()
         self.action_space = self.get_action_space()
 
-        print("ENV VARIABLES :")
-        print("     number_of_building_projects :", self.number_of_building_projects)
-        print("     window_width :", self.window_width)
-        print("     window_height :", self.window_height)
-        #print("     observation_space sample :", self.observation_space.sample())
-        print("     observation_space shape :", self.observation_space.shape)
-        #print("     action_space sample :", self.action_space.sample())
-        print("     action_space shape :", self.action_space.shape)
-
 
     def get_observation_space_2D(self):
         observation_space = []
@@ -76,7 +67,7 @@ class PolyhashEnv(gym.Env):
         print("REWARD :", reward)
         ob = self.getObservationSpace1D()
         self._update_position_building_placement()
-        episode_over = self.position_building_placement[1] > self.window_height
+        episode_over = self.position_building_placement[1] > self.window_height - 1
         return ob, reward, episode_over, {}
 
     def getObservationSpace2D(self):
@@ -118,9 +109,9 @@ class PolyhashEnv(gym.Env):
         """ Reward is the difference of scores between two steps,
         or -10 if a bad action has been chosen. """
         if self.bad_action == True:
-            return -2
-        if action == self.number_of_building_projects:
             return -1
+        if action == self.number_of_building_projects:
+            return 0
         self.env.calcScore()
         reward = self.env.score - self.previous_score
         print("previous_score :", self.previous_score)
@@ -132,7 +123,7 @@ class PolyhashEnv(gym.Env):
 
     def _update_position_building_placement(self):
         self.position_building_placement = tuple(map(lambda x,y : x + y,self.position_building_placement,(1,0)))
-        if self.position_building_placement[0] > self.window_width:
+        if self.position_building_placement[0] > self.window_width - 1:
             self.position_building_placement = (0, self.position_building_placement[1]+1)
         return
 
@@ -141,7 +132,9 @@ class PolyhashEnv(gym.Env):
         self.previous_score = 0
         self.bad_action = False
         self.reward = 0
-        self.position_building_placement = (0,0)
+        self.position_building_placement = np.array((0,0))
+        self.action = None
+        self._seed = randint(0, 200)
         self.env.reset()
         return np.concatenate([np.full(self.window_width * self.window_height, -1),self.position_building_placement])
 
