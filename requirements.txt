@@ -2,3 +2,4 @@ imageio
 gym
 keras-rl
 tensorflow
+matplotlib
