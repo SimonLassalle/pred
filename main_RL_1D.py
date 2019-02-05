@@ -44,6 +44,7 @@ metrics = Metrics(dqn, env)
 dqn.fit(env, nb_steps=100, visualize=True, verbose=2, callbacks=[metrics])
 
 print(metrics)
+metrics.export_figs()
 
 dqn.save_weights('dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
 
