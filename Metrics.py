@@ -23,7 +23,6 @@ class Metrics(keras.callbacks.Callback):
         timestamp = time.time()
         self.metrics[timestamp] = []
         for ordinal, key in enumerate(self.agent.metrics_names, 0):
-            print(key)
             self.metrics[timestamp].append(logs.get('metrics')[ordinal])
         self.metrics[timestamp].append(self.env.reward)
         self.metrics[timestamp].append(self.env.env.score)
@@ -34,12 +33,12 @@ class Metrics(keras.callbacks.Callback):
             result += "%s: %s\n" % (key, self.metrics[key])
         return result
 
-    def export_figs(self):
-        name_metrics = self.agent.metrics_names + ['reward' + 'score']
+    def export_figs(self, modelName):
+        name_metrics = self.agent.metrics_names + ['reward', 'score']
         for i, name_metric in enumerate(name_metrics):
             plt.figure()
             plt.plot([self.metrics[ts][i] for ts in self.metrics], alpha = .6)
-            plt.title('model ' + name_metric)
+            plt.title(modelName + ' ' + name_metric)
             plt.ylabel(name_metric)
             plt.xlabel('epoch')
             #plt.legend(['train', 'test'], loc='upper left')
