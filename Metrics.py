@@ -33,7 +33,7 @@ class Metrics(keras.callbacks.Callback):
             result += "%s: %s\n" % (key, self.metrics[key])
         return result
 
-    def export_figs():
+    def export_figs(self):
         for metric_name in self.metrics.keys():
             plt.figure()
             plt.plot(metrics[metric_name], alpha = .6)
