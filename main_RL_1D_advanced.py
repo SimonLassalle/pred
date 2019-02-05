@@ -60,7 +60,7 @@ dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
-metrics = Metrics(dqn)
+metrics = Metrics(dqn, env)
 dqn.fit(env, nb_steps=1000, visualize=False, verbose=2, callbacks=[metrics])
 
 metrics.export_figs()

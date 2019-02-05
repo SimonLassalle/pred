@@ -34,12 +34,13 @@ class Metrics(keras.callbacks.Callback):
         return result
 
     def export_figs(self):
-        for metric_name in self.metrics.keys():
+        name_metrics = self.agent.metrics_names + ['reward' + 'score']
+        for i, name_metric in enumerate(name_metrics):
             plt.figure()
-            plt.plot(metrics[metric_name], alpha = .6)
-            plt.title('model ' + metric_name)
-            plt.ylabel(metric_name)
+            plt.plot([self.metrics[ts][i] for ts in self.metrics], alpha = .6)
+            plt.title('model ' + name_metric)
+            plt.ylabel(name_metric)
             plt.xlabel('epoch')
             #plt.legend(['train', 'test'], loc='upper left')
-            plt.savefig(metric_name + '.png')
+            plt.savefig(name_metric + '.png')
         return
