@@ -61,10 +61,10 @@ dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
 metrics = Metrics(dqn)
-dqn.fit(env, nb_steps=100, visualize=True, verbose=2, callbacks=[metrics])
+dqn.fit(env, nb_steps=1000, visualize=False, verbose=2, callbacks=[metrics])
+
+metrics.export_figs()
 
 dqn.save_weights('dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
 
-print(metrics)
-
-dqn.test(env, nb_episodes=5000, visualize=True)
+dqn.test(env, nb_episodes=1, visualize=False)

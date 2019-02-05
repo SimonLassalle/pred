@@ -1,5 +1,6 @@
 import keras
 import time
+import matplotlib.pyplot as plt
 
 class Metrics(keras.callbacks.Callback):
 
@@ -31,3 +32,14 @@ class Metrics(keras.callbacks.Callback):
         for key in self.metrics:
             result += "%s: %s\n" % (key, self.metrics[key])
         return result
+
+    def export_figs():
+        for metric_name in self.metrics.keys():
+            plt.figure()
+            plt.plot(metrics[metric_name], alpha = .6)
+            plt.title('model ' + metric_name)
+            plt.ylabel(metric_name)
+            plt.xlabel('epoch')
+            #plt.legend(['train', 'test'], loc='upper left')
+            plt.savefig(metric_name + '.png')
+        return

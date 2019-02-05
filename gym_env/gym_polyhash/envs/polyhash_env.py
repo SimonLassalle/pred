@@ -59,12 +59,8 @@ class PolyhashEnv(gym.Env):
         return action_space
 
     def step(self, action):
-        print()
-        print('POSITION :', self.position_building_placement)
-        print("ACTION AT STEP :", action)
         self._take_action(action)
         reward = self._get_reward(action)
-        print("REWARD :", reward)
         ob = self.getObservationSpace1D()
         self._update_position_building_placement()
         episode_over = self.position_building_placement[1] > self.window_height - 1
@@ -109,17 +105,15 @@ class PolyhashEnv(gym.Env):
         """ Reward is the difference of scores between two steps,
         or -10 if a bad action has been chosen. """
         if self.bad_action == True:
-            return -1
+            self.reward = -1
+            return self.reward
         if action == self.number_of_building_projects:
-            return 0
+            self.reward = 0
+            return self.reward
         self.env.calcScore()
-        reward = self.env.score - self.previous_score
-        print("previous_score :", self.previous_score)
-        print("actual_score :", self.env.score)
-        print("reward :", reward)
+        self.reward = self.env.score - self.previous_score
         self.previous_score = self.env.score
-        self.reward = reward
-        return reward
+        return self.reward
 
     def _update_position_building_placement(self):
         self.position_building_placement = tuple(map(lambda x,y : x + y,self.position_building_placement,(1,0)))
