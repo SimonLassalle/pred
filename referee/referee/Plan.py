@@ -3,7 +3,6 @@ from referee.ProjectType import ProjectType
 from imageio import imwrite
 import numpy as np
 import sys
-from random import choices
 import os.path
 
 class Plan:
