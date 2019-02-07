@@ -42,5 +42,5 @@ class Metrics(keras.callbacks.Callback):
             plt.ylabel(name_metric)
             plt.xlabel('epoch')
             #plt.legend(['train', 'test'], loc='upper left')
-            plt.savefig(name_metric + '.png')
+            plt.savefig('./metrics/' + modelName + '_' + name_metric + '.png')
         return
