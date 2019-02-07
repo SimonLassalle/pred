@@ -5,6 +5,7 @@ import os
 
 import tensorflow as tf
 
+from keras.callbacks import TensorBoard
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Flatten, Reshape, Input, Concatenate, Lambda
 from keras.optimizers import Adam
@@ -59,14 +60,15 @@ memory = SequentialMemory(limit=50000, window_length=1)
 policy = BoltzmannQPolicy()
 dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
-dqn.compile(Adam(lr=1e-3), metrics=['mae', 'acc'])
+dqn.compile(Adam(lr=1e-3), metrics=['mae', 'accuracy'])
 
 metrics = Metrics(dqn, env)
-dqn.fit(env, nb_steps=1000, visualize=False, verbose=2, callbacks=[metrics])
+dqn.fit(env, nb_steps=100, visualize=False, verbose=2, callbacks=[metrics])
 
-for metricName in metrics.metrics.keys():
-    print(metricName)
-print(metrics)
+f1=open('./output/advanced_10000_1.txt', 'w+')
+f1.write(metrics.export_to_text())
+f1.close()
+
 metrics.export_figs(os.path.basename(__file__))
 
 dqn.save_weights('dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)

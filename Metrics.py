@@ -33,6 +33,12 @@ class Metrics(keras.callbacks.Callback):
             result += "%s: %s\n" % (key, self.metrics[key])
         return result
 
+    def export_to_text(self):
+        result = ','.join(['step'] + self.agent.metrics_names + ['reward', 'score']) + '\n'
+        for i, key in enumerate(self.metrics) :
+            result += str(i) + ',' + ','.join([str(x) for x in self.metrics[key]]) + '\n'
+        return result
+
     def export_figs(self, modelName):
         name_metrics = self.agent.metrics_names + ['reward', 'score']
         for i, name_metric in enumerate(name_metrics):
