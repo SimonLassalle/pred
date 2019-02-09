@@ -144,7 +144,7 @@ class PolyhashEnv(gym.Env):
         return self.reward
 
     def _update_position_building_placement(self):
-        """ This function move the . """
+        """ This function move the convolution window. """
         self.position_building_placement = tuple(map(lambda x,y : x + y,self.position_building_placement,(1,0)))
         if self.position_building_placement[0] > self.window_width - 1:
             self.position_building_placement = (0, self.position_building_placement[1]+1)
