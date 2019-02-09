@@ -46,7 +46,7 @@ class PolyhashEnv(gym.Env):
         for x in range(self.window_height) :
             observation_space_line = []
             for y in range(self.window_width) :
-                observation_space_line.append(spaces.Discrete(self.number_of_building_projects))
+                observation_space_line.append(spaces.Discrete(np.inf))
             observation_space.append(spaces.Tuple(observation_space_line))
 
         # Adding tuple representing position_building_placement
@@ -59,7 +59,7 @@ class PolyhashEnv(gym.Env):
         observation_space = []
         for x in range(self.window_height) :
             for y in range(self.window_width) :
-                observation_space.append(spaces.Discrete(self.number_of_building_projects))
+                observation_space.append(spaces.Discrete(np.inf))
 
         # Adding tuple representing position_building_placement
         observation_space.append(spaces.Discrete(self.window_width))
