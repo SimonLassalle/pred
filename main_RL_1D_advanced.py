@@ -56,23 +56,24 @@ model = Model(inputs=[inputs],outputs=[merged])
 model.summary()
 model.compile(Adam(), loss='mean_squared_error')
 
-memory = SequentialMemory(limit=1000, window_length=1)
-policy = MaxBoltzmannQPolicy()
+memory = SequentialMemory(limit=50000, window_length=1)
+policy = BoltzmannQPolicy()
 dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-3), metrics=['mae', 'accuracy'])
 
-metrics = Metrics(dqn, env)
-dqn.fit(env, nb_steps=10000, visualize=False, verbose=2, callbacks=[metrics])
+for i in range(0, 8):
+    metrics = Metrics(dqn, env)
+    dqn.fit(env, nb_steps=10000, visualize=False, verbose=2, callbacks=[metrics])
 
-fileName = '1D_advanced_Sequential10000_MaxBoltzmannQ_10000steps(0)'
+    fileName = '1D_advanced_Sequential50000_BoltzmannQPolicy_10000steps(' + str(i) + ')'
 
-f1=open('./output/' + fileName + '.txt', 'w+')
-f1.write(metrics.export_to_text())
-f1.close()
+    f1=open('./output/' + fileName + '.txt', 'w+')
+    f1.write(metrics.export_to_text())
+    f1.close()
 
-metrics.export_figs()
+    metrics.export_figs(fileName)
 
-dqn.save_weights('./output/' + fileName + '.h5f', overwrite=True)
+    dqn.save_weights('./output/' + fileName + '.h5f', overwrite=True)
 
-dqn.test(env, nb_episodes=1, visualize=False)
+    dqn.test(env, nb_episodes=1, visualize=False)
