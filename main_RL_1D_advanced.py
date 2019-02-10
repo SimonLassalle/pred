@@ -15,7 +15,7 @@ from rl.policy import BoltzmannQPolicy, EpsGreedyQPolicy, MaxBoltzmannQPolicy
 from rl.memory import SequentialMemory
 
 from functools import reduce
-from Metrics import Metrics
+from Metrics_Test import Metrics
 
 import gym_env.gym_polyhash.envs.polyhash_env
 
