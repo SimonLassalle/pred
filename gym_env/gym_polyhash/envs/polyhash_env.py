@@ -19,7 +19,7 @@ class PolyhashEnv(gym.Env):
         """ Initialisation function. """
         # The env variable is an instantiation of the refree developed by
         # Mr. PERREIRA DA SILVA
-        self.env = hash.Plan('data_small/a_example.in')
+        self.env = hash.Plan('data_small/b_short_walk.in')
         # number_of_building_projects describe the number of different building
         # there is.
         self.number_of_building_projects = self.env.number_of_building_projects
