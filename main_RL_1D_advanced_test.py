@@ -63,9 +63,12 @@ dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
 dqn.compile(Adam(lr=1e-3), metrics=['mae', 'accuracy'])
 
 metrics = Metrics(dqn, env)
-fileName = '1D_advanced_Sequential50000_MaxBoltzmannQ_1000000steps(0)'
-#dqn.fit(env, nb_steps=1000000, visualize=False, verbose=2, callbacks=[metrics])
-#dqn.save_weights('./output/' + fileName + '.h5f', overwrite=True)
+#fileName = '1D_advanced_Sequential1000_BoltzmannQ_10000steps(7)'
+#fileName = '1D_advanced_Sequential1000_EpsGreedyQ_10000steps(7)'
+#fileName = '1D_advanced_Sequential1000_MaxBoltzmannQ_10000steps(7)'
+#fileName = '1D_advanced_Sequential50000_BoltzmannQPolicy_10000steps(7)'
+#fileName = '1D_advanced_Sequential50000_MaxBoltzmannQ_1000000steps(0)'
+fileName = '1D__Sequential50000_BoltzmannQ_1000000steps(0)'
 
 dqn.load_weights('./output/' + fileName + '.h5f')
 dqn.test(env, nb_episodes=1, visualize=False, callbacks=[metrics])
@@ -76,7 +79,7 @@ cumulated_reward = metrics.cumulated_reward()
 import matplotlib.pyplot as plt
 plt.figure()
 plt.plot(cumulated_reward, alpha = .6)
-plt.title('cumulated_reward for 1D_advanced_Sequential50000_MaxBoltzmannQ_1000000steps')
+plt.title('cumulated_reward for ' + fileName)
 plt.ylabel('cumulated_reward')
 plt.xlabel('steps')
-plt.savefig('./output/' + fileName + '_cumulated_reward.png')
+plt.savefig('./metrics/' + fileName + '_cumulated_reward.png')

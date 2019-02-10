@@ -41,13 +41,16 @@ dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
 dqn.compile(Adam(lr=1e-3), metrics=['mae', 'acc'])
 
 metrics = Metrics(dqn, env)
-dqn.fit(env, nb_steps=100, visualize=True, verbose=2, callbacks=[metrics])
+dqn.fit(env, nb_steps=1000000, visualize=False, verbose=2, callbacks=[metrics])
 
-for metricName in metrics.metrics.keys():
-    print(metricName)
-print(metrics)
-metrics.export_figs()
+fileName = '1D__Sequential50000_BoltzmannQ_1000000steps(0)'
 
-dqn.save_weights('dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
+f1=open('./output/' + fileName + '.txt', 'w+')
+f1.write(metrics.export_to_text())
+f1.close()
+
+metrics.export_figs(fileName)
+
+dqn.save_weights('./output/' + fileName + '.h5f', overwrite=True)
 
 #dqn.test(env, nb_episodes=1, visualize=True)
