@@ -44,9 +44,9 @@ class Metrics(keras.callbacks.Callback):
         for i, name_metric in enumerate(name_metrics):
             plt.figure()
             plt.plot([self.metrics[ts][i] for ts in self.metrics], alpha = .6)
-            plt.title(modelName + ' ' + name_metric)
+            plt.title(fileName + ' ' + name_metric)
             plt.ylabel(name_metric)
             plt.xlabel('epoch')
-            #plt.legend(['train', 'test'], loc='upper left')
-            plt.savefig('./metrics/' + fileName + '.png')
+            plt.savefig('./metrics/' + fileName + '_' + name_metric + '.png')
+            plt.close('all')
         return
