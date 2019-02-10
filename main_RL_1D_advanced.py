@@ -15,7 +15,7 @@ from rl.policy import BoltzmannQPolicy, EpsGreedyQPolicy, MaxBoltzmannQPolicy
 from rl.memory import SequentialMemory
 
 from functools import reduce
-from Metrics import Metrics
+from Metrics_Test import Metrics
 
 import gym_env.gym_polyhash.envs.polyhash_env
 
@@ -56,23 +56,27 @@ model = Model(inputs=[inputs],outputs=[merged])
 model.summary()
 model.compile(Adam(), loss='mean_squared_error')
 
-memory = SequentialMemory(limit=1000, window_length=1)
+memory = SequentialMemory(limit = 50000, window_length = 1)
 policy = MaxBoltzmannQPolicy()
 dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-3), metrics=['mae', 'accuracy'])
 
 metrics = Metrics(dqn, env)
-dqn.fit(env, nb_steps=10000, visualize=False, verbose=2, callbacks=[metrics])
+fileName = '1D_advanced_Sequential50000_MaxBoltzmannQ_1000000steps(0)'
+#dqn.fit(env, nb_steps=1000000, visualize=False, verbose=2, callbacks=[metrics])
+#dqn.save_weights('./output/' + fileName + '.h5f', overwrite=True)
 
-fileName = '1D_advanced_Sequential10000_MaxBoltzmannQ_10000steps(0)'
+dqn.load_weights('./output/' + fileName + '.h5f')
+dqn.test(env, nb_episodes=1, visualize=False, callbacks=[metrics])
 
-f1=open('./output/' + fileName + '.txt', 'w+')
-f1.write(metrics.export_to_text())
-f1.close()
+metrics.export_figs(fileName)
 
-metrics.export_figs()
-
-dqn.save_weights('./output/' + fileName + '.h5f', overwrite=True)
-
-dqn.test(env, nb_episodes=1, visualize=False)
+cumulated_reward = metrics.cumulated_reward()
+import matplotlib.pyplot as plt
+plt.figure()
+plt.plot(cumulated_reward, alpha = .6)
+plt.title('cumulated_reward for 1D_advanced_Sequential50000_MaxBoltzmannQ_1000000steps')
+plt.ylabel('cumulated_reward')
+plt.xlabel('steps')
+plt.savefig('./output/' + fileName + '_cumulated_reward.png')
