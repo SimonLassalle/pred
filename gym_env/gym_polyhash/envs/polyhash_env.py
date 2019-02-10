@@ -13,6 +13,7 @@ class PolyhashEnv(gym.Env):
     There is no automatic procedure to switch between these two modes. It needs \
     to be manually done. """
     metadata = {'render.modes': ['human']}
+    maxsize = 50
 
     def __init__(self):
         """ Initialisation function. """
@@ -22,9 +23,10 @@ class PolyhashEnv(gym.Env):
         # number_of_building_projects describe the number of different building
         # there is.
         self.number_of_building_projects = self.env.number_of_building_projects
+        self.id_building_projects = list(self.env.building_projects.keys())
         # window_width and window_height represent the size of the convolution.
-        self.window_width = (self.env.nb_rows if self.env.nb_rows < 100 else 100)
-        self.window_height = (self.env.nb_columns if self.env.nb_columns < 100 else 100)
+        self.window_width = (self.env.nb_rows if self.env.nb_rows < PolyhashEnv.maxsize else PolyhashEnv.maxsize)
+        self.window_height = (self.env.nb_columns if self.env.nb_columns < PolyhashEnv.maxsize else PolyhashEnv.maxsize)
         self.bad_action = False
         self.previous_score = 0
 
@@ -100,10 +102,11 @@ class PolyhashEnv(gym.Env):
         # This is a naïve function
         # Since we used only the small map, we never had to test
         # Theses lines.
-        if self.window_width == 100 and self.window_height == 100 :
-            x = self.position_building_placement[0] - 50
-            y = self.position_building_placement[1] - 50
-            new_observation = new_observation[x:x+100,y:y+100]
+        if self.window_width == PolyhashEnv.maxsize and self.window_height == PolyhashEnv.maxsize :
+            x = min(max(self.position_building_placement[0] - PolyhashEnv.maxsize//2, 0), self.env.nb_rows - PolyhashEnv.maxsize//2)
+            y = min(max(self.position_building_placement[1] - PolyhashEnv.maxsize//2, 0), self.env.nb_columns - PolyhashEnv.maxsize//2)
+            new_observation = np.array(new_observation)
+            new_observation = new_observation[x:x+PolyhashEnv.maxsize,y:y+PolyhashEnv.maxsize]
         return new_observation, self.position_building_placement
 
     def get_observation_1D(self):
@@ -111,14 +114,17 @@ class PolyhashEnv(gym.Env):
         observation = self.get_observation_2D()[0]
         new_observation = []
         for x in observation :
-            new_observation += x
+            new_observation += list(x)
         return new_observation + list(self.position_building_placement)
 
     def _take_action(self, action):
         """ This function tries to do the action asked by the network. It \
         update the bad_action variable if the action is not feasible. """
         if action != 3:
-            id = action
+            id = self.id_building_projects[action]
+            # There are indicies not available in building_projects
+            # For instance : the id_building 96 does not exisist in
+            # the building_projects of the map b_short_walk.
             row = self.position_building_placement[0]
             column = self.position_building_placement[1]
             if self.env.canPlaceBuilding(id, row, column):
