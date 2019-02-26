@@ -58,7 +58,7 @@ model.compile(Adam(), loss='mean_squared_error')
 
 memory = SequentialMemory(limit = 50000, window_length = 1)
 policy = MaxBoltzmannQPolicy()
-dqn = DQNAgent(model=model, nb_actions=4, memory=memory, nb_steps_warmup=10,
+dqn = DQNAgent(model=model, nb_actions=nb_neuron_output, memory=memory, nb_steps_warmup=10,
                target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-3), metrics=['mae', 'accuracy'])
 
