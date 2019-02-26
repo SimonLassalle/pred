@@ -71,7 +71,7 @@ dqn.compile(Adam(lr=1e-3), metrics=['mae', 'accuracy'])
 for i in range(0, 8):
     # Create the metrics and pass it to the model as a callback for training
     metrics = Metrics(dqn, env)
-    dqn.fit(env, nb_steps=10000, visualize=False, verbose=2, callbacks=[metrics])
+    dqn.fit(env, nb_steps=10000, visualize=True, verbose=2, callbacks=[metrics])
 
     # the filename has the form modelName_memoryType|memorySize_policy_numberOfSteps
     fileName = '1D_advanced_Sequential50000_BoltzmannQPolicy_10000steps(' + str(i) + ')'

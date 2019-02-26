@@ -49,7 +49,9 @@ metrics = Metrics(dqn, env)
 fileName = '1D__Sequential50000_BoltzmannQ_1000000steps(0)'
 
 dqn.load_weights('./output/' + fileName + '.h5f')
-dqn.test(env, nb_episodes=1, visualize=False, callbacks=[metrics])
+dqn.test(env, nb_episodes=1, visualize=True, callbacks=[metrics])
+print(env.env.score)
+exit(0)
 
 metrics.export_figs(fileName)
 
